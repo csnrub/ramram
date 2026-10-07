@@ -1,0 +1,63 @@
+# NEVER commit memory images, credentials, or case data.
+# Raw physical memory can contain live secrets, keys, and PII — treat as evidence.
+# The runtime blob store (compressed images + sidecars) is ignored; the schema
+# and DB code under storage/ are tracked.
+storage/blobs/
+*.raw
+*.dmp
+*.lime
+*.mem
+*.zst
+*.sidecar.json
+
+# Credentials / env
+.env
+.env.local
+*.key
+storage/vault.enc
+*.vault.enc
+*.pem
+*.kirbi
+*.ccache
+
+# Case DB dumps - but KEEP the tracked schema (the app needs it to init).
+*.sql
+!storage/schema.sql
+*.sqlite
+
+# Transient plaintext working files - decrypted images + pulled captures. These are
+# unencrypted physical memory; they must never be committed.
+vol_work/
+captures/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.uv/
+*.egg-info/
+.ruff_cache/
+
+# Vendored analysis app (fork lives out-of-tree or as submodule - see analysis/README.md)
+analysis/orochi/
+
+# Vendored compiled binaries are COMMITTED on purpose: these tools (MemProcFS,
+# LeechCore/LeechAgent) ship no easy prebuilts and were compiled from source once,
+# so a fresh clone is self-contained and needs no build toolchain. We keep the
+# runtime artifacts and drop only caches, downloaded symbols, and upstream source.
+bin/memprocfs/Symbols/
+bin/memprocfs/__pycache__/
+bin/memprocfs/plugins/__pycache__/
+*.pdb
+
+# LeechCore: ship ONLY the compiled runtime under files/ (the deployable agent),
+# not the upstream source tree or its nested .git.
+bin/LeechCore/*
+!bin/LeechCore/files
+bin/LeechCore/files/temp/
+
+# Unreferenced duplicate of the LeechCore runtime DLLs.
+leechcorefiles/
+
+# Internal Claude Code context file — not for version control.
+CLAUDE.md

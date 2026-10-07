@@ -1,0 +1,50 @@
+[project]
+name = "samram"
+version = "0.0.1"
+description = "DFIR remote memory acquisition + analysis platform — collection plane + hunt loop"
+requires-python = ">=3.12"
+
+# Phase 0 keeps deps minimal. Native memory engines (leechcorepyc, memprocfs,
+# yara-python) and the Sigma path (zircolite/pysigma) are added per-phase so the
+# scaffold stays importable on any box before those C-backed wheels are needed.
+dependencies = [
+    "zstandard>=0.22",     # raw-image compression into storage (output_bus)
+    "cryptography>=42",    # envelope encryption: blob store, vault, sealed logs
+]
+
+[project.optional-dependencies]
+# Installed as each phase comes online - see docs/ROADMAP.md.
+console = [
+    "fastapi>=0.110",        # the web console
+    "uvicorn[standard]>=0.29",
+    "jinja2>=3.1",
+    "python-multipart>=0.0.9",  # form parsing for the console
+]
+analysis = [
+    "psycopg[binary]>=3.1",  # Postgres case DB (Phase 1)
+    "redis>=5.0",            # queue/cache (Phase 1)
+    "volatility3>=2.5",      # the `vol` CLI behind the Vol3 console
+]
+memory = [
+    "memprocfs",             # forensic triage + FindEvil (Phase 1/2b)
+    "leechcorepyc",          # physical memory acquisition (Phase 2)
+    "yara-python",           # YARA over stored dumps (Phase 2b)
+]
+sigma = [
+    "zircolite",             # Sigma over memory-derived events (Phase 5)
+    "sigma-cli",             # rule conversion/validation
+]
+remote = [
+    "impacket>=0.11",        # SMB + SCM remote exec for Stage 1 remote capture
+]
+
+[project.scripts]
+samram-ingest = "ingest:main"
+
+[tool.setuptools]
+packages = ["collection", "collection.collectors", "console", "enumeration", "detection", "hunt", "storage"]
+py-modules = ["ingest"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100

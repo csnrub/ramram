@@ -1,0 +1,28 @@
+# Normalize text to LF in the repo, and NEVER let git's eol conversion touch a
+# binary. Missing this is the usual cause of "the .exe is corrupt after clone":
+# without it, autocrlf rewrites bytes inside .exe/.dll/.sys, and rewrites shell
+# scripts to CRLF so `bash start.sh` dies on stray \r.
+
+* text=auto eol=lf
+
+# Keep executable scripts LF, always (they run under bash/WSL).
+*.sh   text eol=lf
+*.py   text eol=lf
+*.html text eol=lf
+*.css  text eol=lf
+*.sql  text eol=lf
+*.md   text eol=lf
+
+# Treat native toolchain + evidence formats as pure binary (no eol munging).
+*.exe  binary
+*.dll  binary
+*.sys  binary
+*.pdb  binary
+*.db   binary
+*.raw  binary
+*.rmpb binary
+*.alog binary
+*.zst  binary
+*.png  binary
+*.gif  binary
+*.ico  binary
